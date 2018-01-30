@@ -1,0 +1,13 @@
+
+            // .state({
+            //     name: 'app.blogsReadOne.main',
+            //     url: '/blogs/{id}',
+            //     views: {
+            //         'overlay@app.blogs': {
+            //             templateUrl: 'blogsReadMore.html'
+            //         },
+            //         controller: "BlogsController",
+            //         controllerAs: "b"
+            //     }
+
+            // })
