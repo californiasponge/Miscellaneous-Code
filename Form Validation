@@ -1,0 +1,14 @@
+//Colored border on input and checkmark or x
+
+
+        //form validation refactored
+        this.getValidationClass = (name) => {
+
+            if (this.formData[name].$valid && this.formData[name].$dirty) {
+                return 'has-success fa-check'
+            }
+
+            if (this.formData[name].$invalid && this.formData[name].$touched) {
+                return 'has-error fa-times'
+            }
+        }
