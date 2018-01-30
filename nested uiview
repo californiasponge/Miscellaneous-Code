@@ -1,4 +1,7 @@
-
+        $urlRouterProvider
+            .when('/blogs', '/blogs-main')
+            
+            
             // .state({
             //     name: 'app.blogsReadOne.main',
             //     url: '/blogs/{id}',
