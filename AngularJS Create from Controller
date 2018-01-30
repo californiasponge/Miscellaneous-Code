@@ -1,0 +1,38 @@
+b.createNewPost = () => {
+
+            const postRequest = {
+                title: this.title,
+                userId: this.author,
+                categoryId: this.selectedCategory.id,
+                contents: this.message
+            };
+
+            BlogsService.createNewPost(postRequest).then(
+                response => {
+                    BlogsService.getAllBlogPosts();
+                    
+                    this.clearForm();
+                    
+                    $.gritter.add({
+                        title: 'SUCCESS!',
+                        text: 'Your Blog has Posted Successfully',
+                        sticky: true,
+                        time: '',
+                        class_name: 'my-sticky-class'
+                    });
+
+                },
+                err => {
+
+                    $.gritter.add({
+                        title: 'Sorry, Not able to add!',
+                        text: 'Please check the form and try again. Note: All fields are required to post a blog entry',
+                        sticky: true,
+                        time: '',
+                        class_name: 'my-sticky-class'
+                    });
+                
+                }
+            );
+
+        };
