@@ -1,0 +1,22 @@
+   //FILE UPLOAD
+        // var Dropzone = new Dropzone("#dropzone-upload");
+
+Dropzone.autoDiscover = false;
+        $('#dropzone-upload').dropzone({
+            url: "http://strokewars.test/api/imageupload",
+            method: 'POST',
+            maxFiles: 4,
+            clickable: true,
+            withCredentials: true,
+            uploadMultiple: true,
+            addRemoveLinks: true,
+            autoProcessQueue: true,
+            renameFile: function (file) {
+                return file.name;
+            },
+            success: function (file, response) {
+                console.log(file);
+                console.log("Successfully uploaded: " + file.upload.filename);
+            }
+
+        });
