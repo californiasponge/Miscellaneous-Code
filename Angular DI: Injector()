@@ -1,0 +1,5 @@
+const dialogElem = self.$dialog[0];
+const S3UploadService =
+    angular.element(dialogElem)
+    .injector()
+    .get('S3UploadService');
