@@ -1,0 +1,72 @@
+/*
+Three Tables
+  1. Notifications 
+    columns: id INT, sender_user_id INT, content NVARCHAR(MAX), notification_type_id INT, 
+            date_created DATETIME(2)7, date_modified DATETIME(2)7
+    PK: id FK: sender_user_id to id in dbo.users, notification_type_id to id in dbo.notification_type
+  2. Notification_RecipientIds
+   columns: notification_id INT, student_user_id INT
+   PK:  composite
+  3. NotificationTypes
+  columns: id INT, notification_type NVARCHAR(30)
+  PK: id
+  
+  GOAL: when a c# http request fires, grab the teacher ID from a cookie and on the cooresponding service insert request 
+  pass the teacher id, document id, and notification type id to a notification service call implemented by the notification interface.
+  All at once below: the data inserted into the table for published documents is called and inserts a column into notifications
+  which is returned to a c# signalr HUB and based on a dictionary finds all open connections associated with one user 
+  to return a notification of a teacher publishing a homework assignment to all open connections
+
+*/
+
+ALTER PROC [dbo].[StudentInvites_handleNotificationForPublish]
+		@sender_user_id INT,
+		@document_id INT,
+		@notification_type_id INT
+
+AS
+
+DECLARE	@id INT
+DECLARE	@recipient_ids NVARCHAR(4000)
+DECLARE	@content NVARCHAR(MAX)
+
+SET @recipient_ids = 
+	(SELECT student_id
+	FROM StudentInvites
+	WHERE invite_status = 'Registered' AND @sender_user_id = sender_user_id 
+	FOR JSON AUTO)
+
+SET @content = 
+	(SELECT id as docId
+	FROM LMSDocumentStorage
+	WHERE @document_id = id AND @sender_user_id = user_id AND date_published IS NOT NULL
+	FOR JSON AUTO, WITHOUT_ARRAY_WRAPPER)
+
+INSERT INTO Notifications
+(sender_user_id, content, notification_type_id)
+
+VALUES 
+(@sender_user_id, @content, @notification_type_id)
+SET @id = SCOPE_IDENTITY()
+
+/*INSERT INTO NOTIFICATION_RECIPIENTIDS*/
+IF @recipient_ids IS NOT NULL 
+BEGIN
+INSERT INTO Notification_RecipientIds
+(notification_id, student_user_id)
+	SELECT @id AS notification_id, student_user_id
+	FROM OPENJSON(@recipient_ids) WITH (student_user_id INT '$.student_id')
+END
+
+
+/*	TESTING CODE
+	DECLARE 
+			@sender_user_id INT = '3',
+			@document_id INT = '111',
+			@notification_type_id INT = '2'
+
+	EXECUTE StudentInvites_handleNotificationForPublish  
+			@sender_user_id, @document_id, @notification_type_id
+	SELECT * FROM Notifications
+	SELECT * FROM Notification_RecipientIds
+*/
